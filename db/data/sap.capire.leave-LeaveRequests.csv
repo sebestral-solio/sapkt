@@ -1,0 +1,5 @@
+ID,employee_ID,startDate,endDate,reason,status_code,type_code,createdAt,createdBy,modifiedAt,modifiedBy
+1000,E001,2025-07-01,2025-07-05,Annual vacation,P,AL
+1001,E002,2025-07-10,2025-07-12,Medical leave,A,SL
+1002,E001,2025-07-01,2025-07-05,Annual vacation,R,AL
+1003,E002,2025-07-10,2025-07-12,Medical leave,C,SL

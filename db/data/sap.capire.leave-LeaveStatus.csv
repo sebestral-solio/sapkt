@@ -1,0 +1,5 @@
+code,descr,criticality
+P,Pending,2
+A,Approved,3
+R,Rejected,1
+C,Cancelled,0
