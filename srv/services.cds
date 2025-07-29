@@ -8,7 +8,7 @@ service EmployeeService {
   @readonly
   entity Employees as projection on my.Employees;
 }
-annotate EmployeeService.LeaveRequests with @odata.draft.enabled; 
+
 /**
  * Service used by managers/admins to monitor and approve leaves.
  */

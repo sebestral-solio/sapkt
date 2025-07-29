@@ -18,9 +18,12 @@
   },
   "scripts": {
     "start": "cds-serve",
-    "watch-leaverequests": "cds watch --open leaverequests/webapp/index.html?sap-ui-xx-viewCache=false"
+    "watch-leaverequests": "cds watch --open leaverequests/webapp/index.html?sap-ui-xx-viewCache=false",
+    "watch-leave-ui": "cds watch --open leave-ui/webapp/index.html?sap-ui-xx-viewCache=false",
+    "watch-leaveui": "cds watch --open leaveui/webapp/index.html?sap-ui-xx-viewCache=false"
   },
   "sapux": [
-    "app/leaverequests"
+    "app/leaverequests",
+    "app/leave-ui"
   ]
 }

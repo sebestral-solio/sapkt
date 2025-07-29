@@ -2,7 +2,7 @@
 
 specVersion: "3.1"
 metadata:
-  name: ns.leaverequests
+  name: leaveui
 type: application
 server:
   customMiddleware:
