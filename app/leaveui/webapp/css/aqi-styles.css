@@ -1,0 +1,62 @@
+/* Air Quality Index Styling */
+
+/* AQI Status Colors based on EPA standards */
+.aqiGood {
+    color: #0057e4 !important;
+    font-weight: bold;
+}
+
+.aqiModerate {
+    color: #0057e4 !important;
+    font-weight: bold;
+}
+
+.aqiUnhealthy {
+    color: #ff7e00 !important;
+    font-weight: bold;
+}
+
+.aqiVeryUnhealthy {
+    color: #ff0000 !important;
+    font-weight: bold;
+}
+
+.aqiHazardous {
+    color: #8f3f97 !important;
+    font-weight: bold;
+}
+
+/* AQI Panel Styling */
+.sapUiMediumMargin {
+    margin: 1rem;
+}
+
+.sapUiSmallMargin {
+    margin: 0.5rem;
+}
+
+.sapUiTinyMarginTop {
+    margin-top: 0.25rem;
+}
+
+.sapUiTinyMarginEnd {
+    margin-right: 0.25rem;
+}
+
+.sapUiMediumMarginEnd {
+    margin-right: 1rem;
+}
+
+/* AQI Panel Background */
+#aqiPanel .sapMPanelContent {
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+}
+
+/* Responsive design for AQI details */
+@media (max-width: 768px) {
+    .sapUiMediumMarginEnd {
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+}

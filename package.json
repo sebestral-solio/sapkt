@@ -22,6 +22,38 @@
     "watch-leave-ui": "cds watch --open leave-ui/webapp/index.html?sap-ui-xx-viewCache=false",
     "watch-leaveui": "cds watch --open leaveui/webapp/index.html?sap-ui-xx-viewCache=false"
   },
+  "cds": {
+    "requires": {
+      "[development]": {
+        "auth": {
+          "kind": "mocked",
+          "users": {
+            "employee": {
+              "password": "employee",
+              "roles": ["employee"],
+              "attrs": {
+                "ID": "E001"
+              }
+            },
+            "admin": {
+              "password": "admin",
+              "roles": ["admin"],
+              "attrs": {
+                "ID": "A001"
+              }
+            },
+            "manager": {
+              "password": "manager",
+              "roles": ["manager", "admin", "employee"],
+              "attrs": {
+                "ID": "E002"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
   "sapux": [
     "app/leaverequests",
     "app/leave-ui"

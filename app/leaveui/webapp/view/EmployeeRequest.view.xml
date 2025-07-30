@@ -1,0 +1,260 @@
+<mvc:View controllerName="leaveui.controller.EmployeeRequest"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout">
+    <Page id="page" title="Leave Request Management">
+    <headerContent>
+        <Text id="userInfoText" text="" />
+    </headerContent>
+    <content>
+        <!-- Air Quality Index Information Panel -->
+        <Panel id="aqiPanel" headerText="Air Quality Information" class="sapUiMediumMargin" expandable="false">
+            <content>
+                <HBox alignItems="Center" justifyContent="SpaceBetween" class="sapUiSmallMargin">
+                    <VBox>
+                        <HBox alignItems="Center">
+                            <Text text="🌤️" class="sapUiTinyMarginEnd" style="font-size: 1.5rem;"/>
+                            <VBox>
+                                <Text id="aqiLocationText" text="Loading location..." class="sapUiSmallText"/>
+                                <Text id="aqiValueText" text="Loading AQI..." class="sapUiMediumText"/>
+                            </VBox>
+                        </HBox>
+                    </VBox>
+                    <VBox alignItems="End">
+                        <Text id="aqiStatusText" text="" class="sapUiSmallText"/>
+                        <Text id="aqiLastUpdated" text="" class="sapUiTinyText"/>
+                    </VBox>
+                    <Button id="refreshAqiButton" text="🔄" tooltip="Refresh Air Quality Data" press="onRefreshAQI" type="Transparent"/>
+                </HBox>
+                <!-- Detailed AQI Information (collapsible) -->
+                <Panel id="aqiDetailsPanel" headerText="Detailed Air Quality Data" expandable="true" expanded="false" class="sapUiTinyMarginTop">
+                    <content>
+                        <HBox wrap="Wrap" class="sapUiSmallMargin">
+                            <VBox class="sapUiMediumMarginEnd">
+                                <Label text="PM2.5:" class="sapUiTinyText"/>
+                                <Text id="pm25Text" text="-" class="sapUiSmallText"/>
+                            </VBox>
+                            <VBox class="sapUiMediumMarginEnd">
+                                <Label text="PM10:" class="sapUiTinyText"/>
+                                <Text id="pm10Text" text="-" class="sapUiSmallText"/>
+                            </VBox>
+                            <VBox class="sapUiMediumMarginEnd">
+                                <Label text="CO:" class="sapUiTinyText"/>
+                                <Text id="coText" text="-" class="sapUiSmallText"/>
+                            </VBox>
+                            <VBox class="sapUiMediumMarginEnd">
+                                <Label text="NO2:" class="sapUiTinyText"/>
+                                <Text id="no2Text" text="-" class="sapUiSmallText"/>
+                            </VBox>
+                            <VBox class="sapUiMediumMarginEnd">
+                                <Label text="O3:" class="sapUiTinyText"/>
+                                <Text id="o3Text" text="-" class="sapUiSmallText"/>
+                            </VBox>
+                            <VBox class="sapUiMediumMarginEnd">
+                                <Label text="SO2:" class="sapUiTinyText"/>
+                                <Text id="so2Text" text="-" class="sapUiSmallText"/>
+                            </VBox>
+                        </HBox>
+                    </content>
+                </Panel>
+            </content>
+        </Panel>
+        <fb:FilterBar id="filterbar" reset="onReset" search="onSearch" useToolbar="false" showGoOnFB="true">
+            <fb:filterGroupItems>
+                <fb:FilterGroupItem name="employeeId" label="Employee ID" groupName="_BASIC" visibleInFilterBar="true">
+                    <fb:control>
+                        <Input id="employeeIdInput" />
+                    </fb:control>
+                </fb:FilterGroupItem>
+                <fb:FilterGroupItem name="status" label="Status" groupName="_BASIC" visibleInFilterBar="true">
+                    <fb:control>
+                        <ComboBox id="statusComboBox">
+                            <core:Item key="P" text="Pending" />
+                            <core:Item key="A" text="Approved" />
+                            <core:Item key="R" text="Rejected" />
+                            <core:Item key="C" text="Cancelled" />
+                        </ComboBox>
+                    </fb:control>
+                </fb:FilterGroupItem>
+                <fb:FilterGroupItem name="dateRange" label="Date Range" groupName="_BASIC" visibleInFilterBar="true">
+                    <fb:control>
+                        <DateRangeSelection id="dateRangeSelection" />
+                    </fb:control>
+                </fb:FilterGroupItem>
+            </fb:filterGroupItems>
+        </fb:FilterBar>
+        
+        <Toolbar>
+            <content>
+                <Button text="Refresh" icon="sap-icon://refresh" press="onRead"/>
+                <!-- Employee buttons - only visible for employees -->
+                <Button text="New Leave Request" icon="sap-icon://add" press="onOpenCreateDialog" type="Emphasized" 
+                       visible="{= ${requestsTable>/currentUser/roles}.indexOf('employee') !== -1 &amp;&amp; !${requestsTable>/isManager}}"/>
+                <Button text="Update" icon="sap-icon://edit" press="onOpenUpdateDialog" 
+                       enabled="{= ${requestsTable>/selectedIndex} !== -1}" 
+                       visible="{= ${requestsTable>/currentUser/roles}.indexOf('employee') !== -1 &amp;&amp; !${requestsTable>/isManager}}"/>
+                <Button text="Delete" icon="sap-icon://delete" press="onDeleteConfirm" 
+                       enabled="{= ${requestsTable>/selectedIndex} !== -1}" 
+                       visible="{= ${requestsTable>/currentUser/roles}.indexOf('employee') !== -1 &amp;&amp; !${requestsTable>/isManager}}"/>
+                
+                <!-- Manager buttons - only visible for managers -->
+                <Button text="Approve/Reject" icon="sap-icon://decision" press="onOpenStatusUpdateDialog" 
+                       enabled="{= ${requestsTable>/selectedIndex} !== -1}" 
+                       visible="{requestsTable>/isManager}"/>
+                       
+                <ToolbarSpacer/>
+                <SearchField width="30%" search="onSearch" placeholder="Search..."/>
+            </content>
+        </Toolbar>
+        
+        <Table id="requestsTable" 
+               items="{/LeaveRequests}"
+               mode="SingleSelect"
+               selectionChange="onSelectionChange">
+            <columns>
+                <Column width="6em">
+                    <Text text="ID" />
+                </Column>
+                <Column width="8em">
+                    <Text text="Employee" />
+                </Column>
+                <Column width="10em">
+                    <Text text="Start Date" />
+                </Column>
+                <Column width="10em">
+                    <Text text="End Date" />
+                </Column>
+                <Column width="12em">
+                    <Text text="Reason" />
+                </Column>
+                <Column width="8em">
+                    <Text text="Status" />
+                </Column>
+                <Column width="8em">
+                    <Text text="Type" />
+                </Column>
+            </columns>
+            <items>
+                <ColumnListItem vAlign="Middle" type="Active">
+                    <cells>
+                        <Text text="{ID}" />
+                        <Text text="{employee_ID}" />
+                        <Text text="{path: 'startDate', formatter: '.formatDate'}" />
+                        <Text text="{path: 'endDate', formatter: '.formatDate'}" />
+                        <Text text="{reason}" />
+                        <ObjectStatus text="{= ${status_code} === 'P' ? 'Pending' : ${status_code} === 'A' ? 'Approved' : ${status_code} === 'R' ? 'Rejected' : 'Cancelled'}"
+                                      state="{= ${status_code} === 'P' ? 'Warning' : ${status_code} === 'A' ? 'Success' : ${status_code} === 'R' ? 'Error' : 'Information'}" />
+                        <Text text="{= ${type_code} === 'AL' ? 'Annual' : ${type_code} === 'SL' ? 'Sick' : 'Other'}" />
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+    </content>
+    </Page>
+    
+    <!-- Create Leave Request Dialog -->
+    <Dialog id="createLeaveDialog" title="Create Leave Request">
+        <f:SimpleForm editable="true" layout="ResponsiveGridLayout">
+            <f:content>
+                <Label text="Start Date" required="true" />
+                <DatePicker id="startDatePicker" valueFormat="yyyy-MM-dd" required="true" />
+                
+                <Label text="End Date" required="true" />
+                <DatePicker id="endDatePicker" valueFormat="yyyy-MM-dd" required="true" />
+                
+                <Label text="Leave Type" required="true" />
+                <ComboBox id="leaveTypeComboBox" required="true">
+                    <core:Item key="AL" text="Annual Leave" />
+                    <core:Item key="SL" text="Sick Leave" />
+                    <core:Item key="CL" text="Casual Leave" />
+                </ComboBox>
+                
+                <Label text="Reason" required="true" />
+                <TextArea id="reasonTextArea" rows="4" required="true" placeholder="Please provide a reason for your leave request" />
+            </f:content>
+        </f:SimpleForm>
+        <buttons>
+            <Button text="Submit" type="Emphasized" press="onCreateLeaveRequest" />
+            <Button text="Cancel" press="onCloseDialog" />
+        </buttons>
+    </Dialog>
+    
+    <!-- Update Leave Request Dialog -->
+    <Dialog id="updateLeaveDialog" title="Update Leave Request">
+        <f:SimpleForm editable="true" layout="ResponsiveGridLayout">
+            <f:content>
+                <Label text="Request ID" />
+                <Text id="updateRequestId" text="" />
+                
+                <Label text="Start Date" required="true" />
+                <DatePicker id="updateStartDatePicker" valueFormat="yyyy-MM-dd" required="true" />
+                
+                <Label text="End Date" required="true" />
+                <DatePicker id="updateEndDatePicker" valueFormat="yyyy-MM-dd" required="true" />
+                
+                <Label text="Leave Type" required="true" />
+                <ComboBox id="updateLeaveTypeComboBox" required="true">
+                    <core:Item key="AL" text="Annual Leave" />
+                    <core:Item key="SL" text="Sick Leave" />
+                    <core:Item key="CL" text="Casual Leave" />
+                </ComboBox>
+                
+                <Label text="Reason" required="true" />
+                <TextArea id="updateReasonTextArea" rows="4" required="true" />
+            </f:content>
+        </f:SimpleForm>
+        <buttons>
+            <Button text="Update" type="Emphasized" press="onUpdateLeaveRequest" />
+            <Button text="Cancel" press="onCloseDialog" />
+        </buttons>
+    </Dialog>
+    
+    <!-- Delete Confirmation Dialog -->
+    <Dialog id="deleteConfirmDialog" title="Confirm Delete">
+        <content>
+            <Text text="Are you sure you want to delete this leave request?" />
+        </content>
+        <buttons>
+            <Button text="Delete" type="Reject" press="onDelete" />
+            <Button text="Cancel" press="onCloseDialog" />
+        </buttons>
+    </Dialog>
+    
+    <!-- Manager Status Update Dialog -->
+    <Dialog id="statusUpdateDialog" title="Update Leave Request Status">
+        <f:SimpleForm editable="true" layout="ResponsiveGridLayout">
+            <f:content>
+                <Label text="Employee ID" />
+                <Text id="statusEmployeeId" text="" />
+                
+                <Label text="Start Date" />
+                <Text id="statusStartDate" text="" />
+                
+                <Label text="End Date" />
+                <Text id="statusEndDate" text="" />
+                
+                <Label text="Reason" />
+                <Text id="statusReason" text="" />
+                
+                <Label text="Leave Type" />
+                <Text id="statusLeaveType" text="" />
+                
+                <Label text="Current Status" />
+                <Text id="statusCurrentStatus" text="" />
+                
+                <Label text="New Status" required="true" />
+                <ComboBox id="statusComboBoxUpdate" required="true">
+                    <core:Item key="A" text="Approved" />
+                    <core:Item key="R" text="Rejected" />
+                </ComboBox>
+            </f:content>
+        </f:SimpleForm>
+        <buttons>
+            <Button text="Update Status" type="Emphasized" press="onUpdateStatus" />
+            <Button text="Cancel" press="onCloseDialog" />
+        </buttons>
+    </Dialog>
+</mvc:View>
